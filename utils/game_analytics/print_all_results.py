@@ -7,8 +7,6 @@ import json
 import xlsxwriter
 import os
 
-from src.config.paths import PATH_TO_GAMES
-
 
 class PrintJSON:
     """Parse json-format PAR-sheet information."""
@@ -57,9 +55,7 @@ class PrintXLSX:
     def setup_xlsx(self):
         """Initiate Excel format file."""
         self.stat_file_name = os.path.join(
-            PATH_TO_GAMES,
-            str(self.game_info.game_id),
-            "library",
+            self.game_info.libraryPath,
             f"{self.game_info.game_id}_full_statistics.xlsx",
         )
         self.workbook = xlsxwriter.Workbook(self.stat_file_name)
@@ -102,7 +98,7 @@ class PrintXLSX:
         # Write symbol hit-rate table
         symRow = len(self.global_ranges) + 5
         symCol = 0
-        self.top_row_col_end = game_col_start + 4 + idy
+        self.top_row_col_end = game_col_start + 3 + len(game_headers_reduced)
         sym_mode_hit_rate = self.game_info.hr_summary[mode]
         sym_count_hit_rate = self.game_info.sim_count_summary[mode]
         sym_avg_win = self.game_info.av_win_summary[mode]

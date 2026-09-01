@@ -27,6 +27,7 @@ class GameInformation:
 
     def __init__(self, gamestate: object, analysis_ranges=None, modes_to_analyse=None, custom_keys=None):
         self.game_id = gamestate.config.game_id
+        self.config = gamestate.config
         self.modes_to_analyse = modes_to_analyse
         self.config_path = gamestate.output_files.configs["paths"]["be_config"]
         self.math_config_path = gamestate.output_files.configs["paths"]["math_config"]
@@ -93,7 +94,6 @@ class GameInformation:
 
     def load_config(self):
         "Load game config details."
-        config_class = get_config_class(self.game_id)
         with open(self.config_path, "r", encoding="UTF-8") as f:
             config_object = json.load(f)
 
@@ -103,7 +103,6 @@ class GameInformation:
             all_modes.append(mode["name"])
             cost_mapping[mode["name"]] = mode["cost"]
 
-        self.config = config_class
         self.all_modes = all_modes
         self.cost_mapping = cost_mapping
 
@@ -144,7 +143,12 @@ class GameInformation:
         mode_hit_rate_info = {}
         for mode in modes_to_analyse:
             mode_hit_rate_info[mode] = {}
-            lut_path, split_path = return_all_filepaths(self.game_id, mode)
+            lut_path, split_path = return_all_filepaths(
+                self.game_id,
+                mode,
+                publish_path=self.finalLUTPath,
+                lookup_path=self.lutPath,
+            )
             sub_modes = list(self.mode_fence_info[mode].keys())
             mode_sorted_distributions, total_mode_weight = make_split_win_distribution(
                 lut_path, split_path, sub_modes, "basegame"

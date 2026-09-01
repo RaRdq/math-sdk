@@ -132,11 +132,19 @@ def return_hit_rates(all_mode_distributions, total_weight, win_ranges, mode_cost
     return all_mode_hits, all_mode_probs, all_mode_rtps
 
 
-def return_all_filepaths(game_id: str, mode: str):
+def return_all_filepaths(
+    game_id: str,
+    mode: str,
+    *,
+    publish_path: str | None = None,
+    lookup_path: str | None = None,
+):
     """Return file files required for PAR sheet generation."""
-    lut_path = os.path.join(PATH_TO_GAMES, game_id, "library", "publish_files", f"lookUpTable_{mode}_0.csv")
-    split_path = os.path.join(
-        PATH_TO_GAMES, game_id, "library", "lookup_tables", f"lookUpTableSegmented_{mode}.csv"
-    )
+    if publish_path is None:
+        publish_path = os.path.join(PATH_TO_GAMES, game_id, "library", "publish_files")
+    if lookup_path is None:
+        lookup_path = os.path.join(PATH_TO_GAMES, game_id, "library", "lookup_tables")
+    lut_path = os.path.join(publish_path, f"lookUpTable_{mode}_0.csv")
+    split_path = os.path.join(lookup_path, f"lookUpTableSegmented_{mode}.csv")
 
     return lut_path, split_path

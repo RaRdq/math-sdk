@@ -8,20 +8,17 @@ from src.config.paths import PATH_TO_GAMES
 class HitRateCalculations:
     """Calculate hit-rates of symbol and search key combinations."""
 
-    def __init__(self, game_id, mode, mode_cost):
+    def __init__(self, game_id, mode, mode_cost, library_path=None):
         self.game_id = game_id
         self.mode = mode
         self.cost = mode_cost
+        self.library_path = library_path or os.path.join(PATH_TO_GAMES, self.game_id, "library")
         self.initialize_file()
 
     def initialize_file(self) -> None:
         """Initialize force files and lookup tables."""
-        force_file = os.path.join(
-            PATH_TO_GAMES, self.game_id, "library", "forces", f"force_record_{self.mode}.json"
-        )
-        lut_file = os.path.join(
-            PATH_TO_GAMES, self.game_id, "library", "publish_files", f"lookUpTable_{self.mode}_0.csv"
-        )
+        force_file = os.path.join(self.library_path, "forces", f"force_record_{self.mode}.json")
+        lut_file = os.path.join(self.library_path, "publish_files", f"lookUpTable_{self.mode}_0.csv")
         with open(force_file, "r", encoding="UTF-8") as f:
             file_dict = json.load(f)
             all_keys = [d.keys() for d in file_dict]
@@ -114,7 +111,12 @@ def analyse_search_keys(config, modes_to_analyse: list, search_keys: list[dict])
             if bm.get_name() == mode:
                 cost = bm._cost
                 break
-        GameObject = HitRateCalculations(config.game_id, mode, mode_cost=cost)
+        GameObject = HitRateCalculations(
+            config.game_id,
+            mode,
+            mode_cost=cost,
+            library_path=config.library_path,
+        )
         hr_summary[mode], av_win_summary[mode], sim_count_summary[mode] = {}, {}, {}
         for search_key in search_keys:
             valid_key_ids = GameObject.return_valid_ids(search_key)
